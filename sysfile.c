@@ -442,3 +442,32 @@ sys_pipe(void)
   fd[1] = fd1;
   return 0;
 }
+
+int
+sys_lseek(void) {
+  struct file* f;
+  int fd, offset, whence, base;
+  if(argfd(0, &fd, &f) < 0) {
+    return -1;
+  }
+  if(argint(1, &offset) < 0) {
+    return -1;
+  }
+  if(argint(2, &base) < 0) {
+    return -1;
+  }
+  if(base == 0) {
+    whence = offset;
+  }
+  else if(base == 1) {
+    whence = f->off + offset;
+  }
+  else if(base == 2) {
+    whence = f->ip->size + offset;
+  }
+  else {
+    return -1;
+  }
+  f->off = whence;
+  return whence;
+}
